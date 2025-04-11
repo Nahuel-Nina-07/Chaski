@@ -31,6 +31,18 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+.vs/
+
+# ASP.NET Secrets
+appsettings.Development.json
+appsettings.Production.json
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
