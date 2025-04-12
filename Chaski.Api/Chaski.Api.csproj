@@ -4,12 +4,14 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>a566f42c-1bd8-43bb-9581-74783d2e9d04</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8"/>
         <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.3" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.1" />
     </ItemGroup>
 
     <ItemGroup>

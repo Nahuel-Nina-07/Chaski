@@ -4,6 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <UserSecretsId>86472250-208d-4d6d-9acc-8c25a271d1dc</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -19,14 +20,6 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.3" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Database\EntityFramework\Context\" />
-      <Folder Include="Database\EntityFramework\Entities\" />
-      <Folder Include="Database\EntityFramework\Extensions\" />
-      <Folder Include="Database\EntityFramework\Repositories\" />
-      <Folder Include="IoC\DependencyInjection\" />
     </ItemGroup>
 
 </Project>
