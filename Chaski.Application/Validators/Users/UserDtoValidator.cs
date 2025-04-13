@@ -7,8 +7,12 @@ namespace Chaski.Application.Validators.Users;
 public class UserDtoValidator: AbstractValidator<UserDto>
 {
     private readonly IUserRepository _userRepository;
-    public UserDtoValidator()
+    public UserDtoValidator(
+        IUserRepository userRepository
+        )
     {
+        _userRepository = userRepository;
+        
         RuleFor(x => x.Username)
             .NotEmpty().WithMessage("El nombre de usuario es requerido.")
             .MaximumLength(50).WithMessage("El nombre de usuario no puede superar los 50 caracteres.")
@@ -20,7 +24,11 @@ public class UserDtoValidator: AbstractValidator<UserDto>
 
         RuleFor(x => x.PasswordHash)
             .NotEmpty().WithMessage("La contraseña es obligatoria.")
-            .MinimumLength(6).WithMessage("La contraseña debe tener al menos 6 caracteres.");
+            .MinimumLength(8).WithMessage("La contraseña debe tener al menos 8 caracteres.")
+            .Matches("[A-Z]").WithMessage("La contraseña debe contener al menos una letra mayúscula.")
+            .Matches("[a-z]").WithMessage("La contraseña debe contener al menos una letra minúscula.")
+            .Matches("[0-9]").WithMessage("La contraseña debe contener al menos un número.")
+            .Matches("[^a-zA-Z0-9]").WithMessage("La contraseña debe contener al menos un carácter especial.");
 
         RuleFor(x => x.Status)
             .IsInEnum().WithMessage("El estado del usuario no es válido.");

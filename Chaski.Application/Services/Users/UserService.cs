@@ -4,6 +4,7 @@ using Chaski.Application.Dtos;
 using Chaski.Application.Extensions.Users;
 using Chaski.Domain.Entities.Users;
 using Chaski.Domain.Repositories.Users;
+using Chaski.Domain.Security;
 using FluentValidation;
 
 namespace Chaski.Application.Services.Users;
@@ -12,11 +13,15 @@ public class UserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IValidator<UserDto> _validator;
+    private readonly IPasswordHasher _passwordHasher;
 
-    public UserService(IUserRepository userRepository, IValidator<UserDto> validator)
+
+    public UserService(IUserRepository userRepository, IValidator<UserDto> validator, IPasswordHasher passwordHasher)
     {
         _userRepository = userRepository;
         _validator = validator;
+        _passwordHasher = passwordHasher;
+
     }
 
     public async Task<Result<UserDto>> CreateUserAsync(UserDto userDto)
@@ -25,11 +30,13 @@ public class UserService
         if (!validateModel.IsValid)
             return Result<UserDto>.Failure(validateModel.Errors.Select(e => e.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
 
+        var passwordHash = _passwordHasher.HashPassword(userDto.PasswordHash);
+
         var user = new User(
             userDto.Id,
             userDto.Username,
             userDto.Email,
-            userDto.PasswordHash,
+            passwordHash,
             userDto.Status
         );
 
