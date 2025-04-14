@@ -1,6 +1,6 @@
 using System.Net;
 using Chaski.Application.Common;
-using Chaski.Application.Dtos;
+using Chaski.Application.Dtos.Users;
 using Chaski.Application.Extensions.Users;
 using Chaski.Domain.Entities.Users;
 using Chaski.Domain.Repositories.Users;
