@@ -1,4 +1,5 @@
 using System.Reflection;
+using Chaski.Application.Services.Auth;
 using Chaski.Application.Services.Users;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,7 @@ public static class ChaskiApplicationDependencyInjection
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddTransient<UserService>();
+        services.AddTransient<AuthService>();
 
         services.AddValidatorsFromAssembly(Assembly.Load("Chaski.Application"));
 

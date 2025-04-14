@@ -1,4 +1,4 @@
-using Chaski.Application.Dtos;
+using Chaski.Application.Dtos.Users;
 using Chaski.Domain.Entities.Users;
 
 namespace Chaski.Application.Extensions.Users;

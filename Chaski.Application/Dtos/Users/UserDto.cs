@@ -1,6 +1,6 @@
 using Chaski.Domain.Enums;
 
-namespace Chaski.Application.Dtos;
+namespace Chaski.Application.Dtos.Users;
 
 public record UserDto
 (
