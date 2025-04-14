@@ -1,4 +1,4 @@
-namespace Chaski.Infrastructure.Security;
+namespace Chaski.Infrastructure.Settings;
 
 public class JwtSettings
 {

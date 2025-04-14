@@ -17,6 +17,7 @@ builder.Configuration
 builder.Services
     .AddApiDependencies()
     .AddApplicationServices()
+    .AddApplicationValidators()
     .AddDomainServices()
     .AddInfrastructure(builder.Configuration)
     .AddJwtAuthentication(builder.Configuration)
@@ -55,14 +56,18 @@ app.UseCors("CORSPolicy");
 app.UseMiddleware<MiddlewareException>();
 app.UseMiddleware<NotFoundMiddleware>();
 
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+if (app.Environment.IsDevelopment())
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "CHASKI API v1");
-    c.RoutePrefix = "swagger";
-    c.EnableFilter();
-});
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "CHASKI API v1");
+        c.RoutePrefix = "swagger";
+        c.EnableFilter();
+    });
+}
 
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 

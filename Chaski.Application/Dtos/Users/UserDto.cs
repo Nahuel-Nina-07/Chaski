@@ -10,3 +10,9 @@ public record UserDto
     string PasswordHash,
     UserStatus Status
 );
+
+public record CreateUserDto(
+    string Username,
+    string Email,
+    string PasswordHash
+);
