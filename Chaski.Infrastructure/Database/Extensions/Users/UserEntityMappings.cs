@@ -5,7 +5,7 @@ using Chaski.Infrastructure.Database.Entities.Users;
 
 namespace Chaski.Infrastructure.Database.Extensions.Users;
 
-public static class UserMappings
+public static class UserEntityMappings
 {
     public static UserEntity ToEntity(this User user)
     {

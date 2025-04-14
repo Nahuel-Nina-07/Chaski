@@ -1,7 +1,7 @@
 using System.Net;
-using Chaski.Application.Common.Estension;
+using Chaski.Application.Common.Extensions;
 
-namespace Chaski.Application.Common;
+namespace Chaski.Application.Common.Helpers;
 
 public class Result<T>
 {

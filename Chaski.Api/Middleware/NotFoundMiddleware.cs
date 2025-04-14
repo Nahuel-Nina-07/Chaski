@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using Chaski.Application.Common;
+using Chaski.Application.Common.Helpers;
 
 namespace Chaski.Api.Middleware;
 

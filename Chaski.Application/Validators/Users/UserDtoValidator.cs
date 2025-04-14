@@ -23,12 +23,13 @@ public class UserDtoValidator: AbstractValidator<UserDto>
             .EmailAddress().WithMessage("El correo electrónico no es válido.");
 
         RuleFor(x => x.PasswordHash)
-            .NotEmpty().WithMessage("La contraseña es obligatoria.")
-            .MinimumLength(8).WithMessage("La contraseña debe tener al menos 8 caracteres.")
-            .Matches("[A-Z]").WithMessage("La contraseña debe contener al menos una letra mayúscula.")
-            .Matches("[a-z]").WithMessage("La contraseña debe contener al menos una letra minúscula.")
-            .Matches("[0-9]").WithMessage("La contraseña debe contener al menos un número.")
-            .Matches("[^a-zA-Z0-9]").WithMessage("La contraseña debe contener al menos un carácter especial.");
+            .Cascade(CascadeMode.Stop)
+            .NotEmpty().When(x => x.Id == 0).WithMessage("La contraseña es obligatoria.")
+            .MinimumLength(8).When(x => !string.IsNullOrWhiteSpace(x.PasswordHash)).WithMessage("Debe tener al menos 8 caracteres.")
+            .Matches("[A-Z]").When(x => !string.IsNullOrWhiteSpace(x.PasswordHash)).WithMessage("Debe tener al menos una mayúscula.")
+            .Matches("[a-z]").When(x => !string.IsNullOrWhiteSpace(x.PasswordHash)).WithMessage("Debe tener al menos una minúscula.")
+            .Matches("[0-9]").When(x => !string.IsNullOrWhiteSpace(x.PasswordHash)).WithMessage("Debe tener al menos un número.")
+            .Matches("[^a-zA-Z0-9]").When(x => !string.IsNullOrWhiteSpace(x.PasswordHash)).WithMessage("Debe tener al menos un carácter especial.");
 
         RuleFor(x => x.Status)
             .IsInEnum().WithMessage("El estado del usuario no es válido.");

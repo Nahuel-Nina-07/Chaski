@@ -1,4 +1,6 @@
-namespace Chaski.Application.Common.Estension;
+using Chaski.Application.Common.Helpers;
+
+namespace Chaski.Application.Common.Extensions;
 
 public static class ResultExtensions
 {

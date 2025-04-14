@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Chaski.Application.Common.Estension;
+namespace Chaski.Application.Common.Extensions;
 
 public static class HttpStatusCodeExtensions
 {
