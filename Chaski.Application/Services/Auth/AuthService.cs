@@ -1,7 +1,9 @@
 using System.Net;
 using Chaski.Application.Common;
+using Chaski.Application.Common.Constants;
 using Chaski.Application.Common.Helpers;
 using Chaski.Application.Dtos.Auth;
+using Chaski.Domain.Enums;
 using Chaski.Domain.Repositories.Users;
 using Chaski.Domain.Security;
 
@@ -19,18 +21,35 @@ public class AuthService
         _hasher = hasher;
         _tokenService = tokenService;
     }
-
+    
     public async Task<Result<string>> LoginAsync(LoginDto dto)
     {
         var user = await _userRepo.GetByUsernameAsync(dto.Username);
+    
         if (user == null || !_hasher.VerifyPassword(user.PasswordHash, dto.Password))
         {
-            return Result<string>.Failure("Credenciales inválidas", HttpStatusCode.Unauthorized);
+            return Result<string>.Failure(
+                AuthErrorMessages.InvalidCredentials, 
+                HttpStatusCode.Unauthorized);
         }
-        
-        var roles = new List<string> { "Admin" };
-        
+    
+        if (!user.IsEmailConfirmed)
+        {
+            return Result<string>.Failure(
+                AuthErrorMessages.EmailNotConfirmed, 
+                HttpStatusCode.Forbidden);
+        }
+    
+        if (user.Status != UserStatus.Active)
+        {
+            return Result<string>.Failure(
+                AuthErrorMessages.AccountNotActive, 
+                HttpStatusCode.Forbidden);
+        }
+    
+        var roles = new List<string> { "Admin" }; // Obtener roles reales de la base de datos
         var token = _tokenService.GenerateToken(user, roles);
+    
         return Result<string>.Success(token, HttpStatusCode.OK);
     }
 }

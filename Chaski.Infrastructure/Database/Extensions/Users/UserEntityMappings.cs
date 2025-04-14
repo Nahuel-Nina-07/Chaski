@@ -15,19 +15,24 @@ public static class UserEntityMappings
             Username = user.Username,
             Email = user.Email,
             PasswordHash = user.PasswordHash,
-            Status = user.Status.ToString()
+            Status = user.Status.ToString(),
+            EmailConfirmationToken = user.EmailConfirmationToken,
+            IsEmailConfirmed = user.IsEmailConfirmed,
+            EmailConfirmationTokenExpiry = user.EmailConfirmationTokenExpiry
         };
     }
 
     public static User ToDomain(this UserEntity entity)
     {
-        return new User
-        (
-            entity.Id,
-            entity.Username,
-            entity.Email,
-            entity.PasswordHash,
-            Enum.Parse<UserStatus>(entity.Status)
+        return new User(
+            id: entity.Id,
+            username: entity.Username,
+            email: entity.Email,
+            passwordHash: entity.PasswordHash,
+            status: Enum.Parse<UserStatus>(entity.Status),
+            emailConfirmationToken: entity.EmailConfirmationToken,
+            isEmailConfirmed: entity.IsEmailConfirmed,
+            emailConfirmationTokenExpiry: entity.EmailConfirmationTokenExpiry
         );
     }
 }

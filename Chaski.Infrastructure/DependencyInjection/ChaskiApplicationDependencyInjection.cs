@@ -10,12 +10,12 @@ public static class ChaskiApplicationDependencyInjection
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        services.AddTransient<UserService>();
-        services.AddTransient<AuthService>();
+        services.AddScoped<UserService>();
+        services.AddScoped<AuthService>();
 
-        services.AddValidatorsFromAssembly(Assembly.Load("Chaski.Application"));
-
-        ValidatorOptions.Global.DisplayNameResolver = (type, memberInfo, expression) => memberInfo?.Name;
+        // services.AddValidatorsFromAssembly(Assembly.Load("Chaski.Application"));
+        //
+        // ValidatorOptions.Global.DisplayNameResolver = (type, memberInfo, expression) => memberInfo?.Name;
 
         return services;
     }

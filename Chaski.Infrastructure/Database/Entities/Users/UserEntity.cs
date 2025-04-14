@@ -21,4 +21,13 @@ public class UserEntity:BaseEntity
     [Required]
     [Column("status")]
     public string Status { get; set; }
+    
+    [Column("emailConfirmationToken")]
+    public string? EmailConfirmationToken { get; set; }
+
+    [Column("isEmailConfirmed")]
+    public bool IsEmailConfirmed { get; set; }
+
+    [Column("emailConfirmationTokenExpiry")]
+    public DateTime? EmailConfirmationTokenExpiry { get; set; }
 }

@@ -21,7 +21,8 @@ public class UserRepository:GenericRepository<UserEntity>, IUserRepository
         var userEntity = entity.ToEntity();
         var created = await _context.Users.AddAsync(userEntity);
         await _context.SaveChangesAsync();
-        return created.Entity.ToDomain();    }
+        return created.Entity.ToDomain();    
+    }
 
     public async Task<User?> GetByIdAsync(int id)
     {
@@ -55,6 +56,13 @@ public class UserRepository:GenericRepository<UserEntity>, IUserRepository
     {
         var entity = await _context.Users
             .FirstOrDefaultAsync(u => u.Email == email);
+        return entity?.ToDomain();
+    }
+
+    public async Task<User?> GetByEmailConfirmationTokenAsync(string token)
+    {
+        var entity = await _context.Users
+            .FirstOrDefaultAsync(u => u.EmailConfirmationToken == token);
         return entity?.ToDomain();
     }
 }

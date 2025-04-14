@@ -1,6 +1,7 @@
 using System.Text;
 using Chaski.Domain.Security;
 using Chaski.Infrastructure.Security;
+using Chaski.Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

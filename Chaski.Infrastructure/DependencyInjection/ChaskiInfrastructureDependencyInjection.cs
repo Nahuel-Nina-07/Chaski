@@ -1,8 +1,11 @@
+using Chaski.Application.Services.Email;
 using Chaski.Domain.Repositories.Users;
 using Chaski.Domain.Security;
 using Chaski.Infrastructure.Database.Context;
 using Chaski.Infrastructure.Database.Repositories.Users;
 using Chaski.Infrastructure.Security;
+using Chaski.Infrastructure.Services;
+using Chaski.Infrastructure.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +24,9 @@ public static class ChaskiInfrastructureDependencyInjection
         });
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddScoped<IPasswordHasher, Argon2PasswordHasher>();
+        
+        services.AddTransient<IEmailService, EmailService>();
+        services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
         return services;
     }
 }

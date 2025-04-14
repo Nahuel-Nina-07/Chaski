@@ -6,6 +6,7 @@ public static class ApiDependencyInjection
 {
     public static IServiceCollection AddApiDependencies(this IServiceCollection services)
     {
+        services.AddControllers();
         services.AddEndpointsApiExplorer();
 
         services.AddSwaggerGen(c =>
