@@ -29,7 +29,6 @@ jobs:
           source-path: './publish'
           target-delete: true
 
-      # --- Paso 4: Notificación en Slack (éxito/error) ---
       - name: Prepare Slack Notification
         id: prepare-slack-notification
         run: |
