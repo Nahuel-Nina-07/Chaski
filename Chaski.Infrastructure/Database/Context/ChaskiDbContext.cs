@@ -1,5 +1,7 @@
 using Chaski.Infrastructure.Database.Entities;
 using Chaski.Infrastructure.Database.Entities.Users;
+using Chaski.Infrastructure.Database.Seeds;
+using Chaski.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 
 namespace Chaski.Infrastructure.Database.Context;
@@ -9,6 +11,9 @@ public class ChaskiDbContext:DbContext
     // public DbSet<CareerSubjectEnabledEntity> CareerSubjectEnableds { get; set; }
     //Users
     public DbSet<UserEntity> Users { get; set; }
+    public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
+    public DbSet<UserRoleEntity> UserRoles { get; set; }
+    public DbSet<RoleEntity> Roles { get; set; }
     public ChaskiDbContext(DbContextOptions<ChaskiDbContext> options) : base(options)
     {
         ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
@@ -16,8 +21,14 @@ public class ChaskiDbContext:DbContext
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.ApplyConfigurationsFromAssembly(typeof(ChaskiDbContext).Assembly);
         base.OnModelCreating(builder);
+
+        builder.ApplyConfigurationsFromAssembly(typeof(ChaskiDbContext).Assembly);
+        
+        var hasher = new Argon2PasswordHasher();
+        builder.Entity<RoleEntity>().HasData(RoleSeed.GetSeedData());
+        builder.Entity<UserEntity>().HasData(UserSeed.GetSeedData(hasher));
+        builder.Entity<UserRoleEntity>().HasData(UserRoleSeed.GetSeedData());
     }
 
     public override int SaveChanges()

@@ -11,9 +11,8 @@ public static class UserDtoMappings
             user.Id, 
             user.Username, 
             user.Email, 
-            "", // No exponer el hash
+            "",
             user.Status
-            // No incluir los campos internos
         );
 
     public static User ToDomain(this CreateUserDto dto) =>
@@ -22,6 +21,6 @@ public static class UserDtoMappings
             dto.Username,
             dto.Email,
             dto.PasswordHash,
-            UserStatus.PendingEmailConfirmation // Estado por defecto
+            UserStatus.PendingEmailConfirmation
         );
 }

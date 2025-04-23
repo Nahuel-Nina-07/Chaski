@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using System.Threading.RateLimiting;
 using Chaski.Api.DependencyInjection;
 using Chaski.Api.Endpoints.Auth;
 using Chaski.Api.Endpoints.Users;
@@ -21,7 +23,24 @@ builder.Services
     .AddDomainServices()
     .AddInfrastructure(builder.Configuration)
     .AddJwtAuthentication(builder.Configuration)
-    .AddAuthorization();
+    .AddAuthorization(options =>
+    {
+        options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+        options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
+    })
+    .AddRateLimiter(options =>
+    {
+        options.AddPolicy("password-reset", context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: context.User.Identity?.Name ?? context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                factory: _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 3,
+                    Window = TimeSpan.FromHours(1),
+                    QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                    QueueLimit = 0
+                }));
+    });
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -70,6 +89,10 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
+
+app.UseMiddleware<JwtMiddleware>();
+app.UseMiddleware<TokenExpirationMiddleware>();
 
 app.MapUserEndpoints();
 app.MapAuthEndpoints();

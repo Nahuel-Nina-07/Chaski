@@ -2,9 +2,9 @@ namespace Chaski.Domain.Enums;
 
 public enum UserStatus
 {
-    PendingEmailConfirmation, // Añade este nuevo estado
+    PendingEmailConfirmation,
     Active,
     Inactive,
     Suspended,
-    Banned // Podrías añadir otros estados según necesites
+    Banned 
 }

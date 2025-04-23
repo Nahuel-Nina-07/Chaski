@@ -20,7 +20,7 @@ public class UserEntity:BaseEntity
     
     [Required]
     [Column("status")]
-    public string Status { get; set; }
+    public int Status { get; set; }
     
     [Column("emailConfirmationToken")]
     public string? EmailConfirmationToken { get; set; }
@@ -30,4 +30,14 @@ public class UserEntity:BaseEntity
 
     [Column("emailConfirmationTokenExpiry")]
     public DateTime? EmailConfirmationTokenExpiry { get; set; }
+    
+    [Column("passwordResetTokenHash")]
+    public string? PasswordResetTokenHash { get; set; }
+
+    [Column("passwordResetTokenExpiry")]
+    public DateTime? PasswordResetTokenExpiry { get; set; }
+    
+    public virtual ICollection<UserRoleEntity> UserRoles { get; set; } 
+    
+    public virtual ICollection<RefreshTokenEntity> RefreshTokens { get; set; }
 }

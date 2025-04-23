@@ -22,6 +22,8 @@ public class UserService
     private readonly IPasswordHasher _passwordHasher;
     private readonly IEmailService _emailService;
     private readonly IConfiguration _configuration;
+    private readonly IUserRoleRepository _userRoleRepository;
+    private readonly IRoleRepository _roleRepository;
 
 
     public UserService(
@@ -30,7 +32,9 @@ public class UserService
         IValidator<UserDto> updateValidator,
         IPasswordHasher passwordHasher, 
         IEmailService emailService, 
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IUserRoleRepository userRoleRepository,
+        IRoleRepository roleRepository)
     {
         _userRepository = userRepository;
         _validator = validator;
@@ -38,6 +42,8 @@ public class UserService
         _passwordHasher = passwordHasher;
         _configuration = configuration;
         _emailService = emailService;
+        _userRoleRepository = userRoleRepository;
+        _roleRepository = roleRepository;
     }
 
     public async Task<Result<UserDto>> CreateUserAsync(CreateUserDto createDto)
@@ -45,38 +51,32 @@ public class UserService
         var validateModel = await _validator.ValidateAsync(createDto);
         if (!validateModel.IsValid)
             return Result<UserDto>.Failure(validateModel.Errors.Select(e => e.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
-
         if (await _userRepository.GetByEmailAsync(createDto.Email) != null)
             return Result<UserDto>.Failure("El correo electrónico ya está registrado", HttpStatusCode.BadRequest);
-
         var passwordHash = _passwordHasher.HashPassword(createDto.PasswordHash);
-
         var user = new User(
-            0, // ID temporal
+            0,
             createDto.Username,
             createDto.Email,
             passwordHash,
-            UserStatus.PendingEmailConfirmation // Estado fijo
+            UserStatus.PendingEmailConfirmation
         );
-
-        // Generar token de confirmación
         var token = Guid.NewGuid().ToString();
         var expiryDate = DateTime.UtcNow.AddHours(
             _configuration.GetValue<int>("EmailConfirmation:TokenExpiryInHours", 24));
-    
         user.GenerateEmailConfirmationToken(token, expiryDate);
-
         var createdUser = await _userRepository.CreateAsync(user);
 
-        // Enviar email de confirmación
+        var userRoleId = await _roleRepository.GetRoleIdByNameAsync("User");
+        if (userRoleId.HasValue)
+            await _userRoleRepository.AssignRoleAsync(createdUser.Id, userRoleId.Value);
+        
         var confirmationBaseUrl = _configuration["EmailConfirmation:BaseUrl"];
         var confirmationLink = $"{confirmationBaseUrl}?token={token}&email={Uri.EscapeDataString(user.Email)}";
-    
         await _emailService.SendEmailConfirmationAsync(
             user.Email, 
             user.Username, 
             confirmationLink);
-
         return Result<UserDto>.Success(createdUser.ToDto(), HttpStatusCode.Created);
     }
     public async Task<Result<bool>> ConfirmEmailAsync(string token, string email)
@@ -107,7 +107,6 @@ public class UserService
         var user = await _userRepository.GetByIdAsync(id);
         if (user == null)
             return Result<UserDto>.Failure("Usuario no encontrado", HttpStatusCode.NotFound);
-
         return Result<UserDto>.Success(user.ToDto(), HttpStatusCode.OK);
     }
 
@@ -122,15 +121,11 @@ public class UserService
         var validateModel = await _updateValidator.ValidateAsync(userDto);
         if (!validateModel.IsValid)
             return Result<UserDto>.Failure(validateModel.Errors.Select(e => e.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
-
         var user = await _userRepository.GetByIdAsync(userDto.Id);
         if (user == null)
             return Result<UserDto>.Failure("Usuario no encontrado", HttpStatusCode.NotFound);
-
         user.UpdateStatus(userDto.Status);
-
         var updatedUser = await _userRepository.UpdateAsync(user);
-
         return Result<UserDto>.Success(updatedUser.ToDto(), HttpStatusCode.OK);
     }
     
@@ -139,7 +134,6 @@ public class UserService
         var user = await _userRepository.GetByUsernameAsync(username);
         if (user == null)
             return Result<UserDto>.Failure("Usuario no encontrado", HttpStatusCode.NotFound);
-
         return Result<UserDto>.Success(user.ToDto(), HttpStatusCode.OK);
     }
 
@@ -148,7 +142,6 @@ public class UserService
         var user = await _userRepository.GetByEmailAsync(email);
         if (user == null)
             return Result<UserDto>.Failure("Usuario no encontrado", HttpStatusCode.NotFound);
-
         return Result<UserDto>.Success(user.ToDto(), HttpStatusCode.OK);
     }
 }

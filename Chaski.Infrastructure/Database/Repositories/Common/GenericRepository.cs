@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Chaski.Domain.Repositories.Common;
 using Chaski.Infrastructure.Database.Context;
 using Chaski.Infrastructure.Database.Entities;
@@ -53,5 +54,10 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
     public async Task<List<TEntity>> GetAllAsync()
     {
         return await _dbSet.ToListAsync();
+    }
+
+    public async Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> predicate)
+    {
+        return await _dbSet.Where(predicate).ToListAsync();
     }
 }
