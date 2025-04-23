@@ -23,7 +23,7 @@ jobs:
         run: dotnet publish -c Release -o ./publish
 
       - name: Deploy to MonsterASP.NET via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5  # Cambié la versión aquí
         with:
           server: site23621.siteasp.net         # Servidor FTP
           username: site23621                   # Nombre de usuario FTP
