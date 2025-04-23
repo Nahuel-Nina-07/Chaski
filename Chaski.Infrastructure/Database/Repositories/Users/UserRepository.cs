@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Chaski.Domain.Entities.Users;
 using Chaski.Domain.Repositories.Users;
 using Chaski.Infrastructure.Database.Context;
@@ -59,10 +60,15 @@ public class UserRepository:GenericRepository<UserEntity>, IUserRepository
         return entity?.ToDomain();
     }
 
-    public async Task<User?> GetByEmailConfirmationTokenAsync(string token)
+    public async Task<IList<string>> GetUserRolesAsync(int userId)
     {
-        var entity = await _context.Users
-            .FirstOrDefaultAsync(u => u.EmailConfirmationToken == token);
-        return entity?.ToDomain();
+        return await _context.UserRoles
+            .Where(ur => ur.UserId == userId)
+            .Join(_context.Roles,
+                userRole => userRole.RoleId,
+                role => role.Id,
+                (userRole, role) => role.Name)
+            .ToListAsync();
     }
+
 }

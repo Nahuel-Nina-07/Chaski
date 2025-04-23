@@ -15,10 +15,12 @@ public static class UserEntityMappings
             Username = user.Username,
             Email = user.Email,
             PasswordHash = user.PasswordHash,
-            Status = user.Status.ToString(),
+            Status = (int)user.Status,
             EmailConfirmationToken = user.EmailConfirmationToken,
             IsEmailConfirmed = user.IsEmailConfirmed,
-            EmailConfirmationTokenExpiry = user.EmailConfirmationTokenExpiry
+            EmailConfirmationTokenExpiry = user.EmailConfirmationTokenExpiry,
+            PasswordResetTokenHash = user.PasswordResetTokenHash,
+            PasswordResetTokenExpiry = user.PasswordResetTokenExpiry
         };
     }
 
@@ -29,10 +31,12 @@ public static class UserEntityMappings
             username: entity.Username,
             email: entity.Email,
             passwordHash: entity.PasswordHash,
-            status: Enum.Parse<UserStatus>(entity.Status),
+            status: (UserStatus)entity.Status,
             emailConfirmationToken: entity.EmailConfirmationToken,
             isEmailConfirmed: entity.IsEmailConfirmed,
-            emailConfirmationTokenExpiry: entity.EmailConfirmationTokenExpiry
+            emailConfirmationTokenExpiry: entity.EmailConfirmationTokenExpiry,
+            passwordResetTokenHash: entity.PasswordResetTokenHash,
+            passwordResetTokenExpiry: entity.PasswordResetTokenExpiry
         );
     }
 }

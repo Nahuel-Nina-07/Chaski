@@ -2,7 +2,7 @@
 
 ![Logo de Chaski](./assets/Chaski-Logo.png)
 
-**Chaski** es una solución innovadora para gestionar pedidos de compras de manera eficiente. Este sistema, desarrollado por **Denuel Corporation**, permite a los usuarios realizar pedidos de productos y servicios a través de una interfaz sencilla, mientras que el backend gestiona la lógica de negocio, las bases de datos y la seguridad. El sistema está basado en **Clean Architecture**, utilizando los mejores patrones de diseño como **Repository Pattern** y **Dependency Injection** para garantizar la escalabilidad y mantenibilidad del proyecto.
+**Chaski** es una solución innovadora para gestionar pedidos de compras de manera eficiente. Este sistema, desarrollado por **Yawar Express**, permite a los usuarios realizar pedidos de productos y servicios a través de una interfaz sencilla, mientras que el backend gestiona la lógica de negocio, las bases de datos y la seguridad. El sistema está basado en **Clean Architecture**, utilizando los mejores patrones de diseño como **Repository Pattern** y **Dependency Injection** para garantizar la escalabilidad y mantenibilidad del proyecto.
 
 ## Descripción
 
