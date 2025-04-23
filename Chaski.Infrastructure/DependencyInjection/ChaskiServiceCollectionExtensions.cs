@@ -13,10 +13,17 @@ public static class ChaskiServiceCollectionExtensions
 {
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<ITokenService, JwtTokenService>();
+        services.AddSingleton<ITokenService, JwtTokenService>();
 
         var jwtSettings = configuration.GetSection("Jwt");
         services.Configure<JwtSettings>(jwtSettings);
+
+        var key = jwtSettings["Key"];
+        var issuer = jwtSettings["Issuer"];
+        var audience = jwtSettings["Audience"];
+
+        if (string.IsNullOrWhiteSpace(key))
+            throw new InvalidOperationException("JWT Key is not configured.");
 
         services.AddAuthentication(options =>
             {
@@ -29,15 +36,20 @@ public static class ChaskiServiceCollectionExtensions
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = jwtSettings["Issuer"],
+                    ValidIssuer = issuer,
+
                     ValidateAudience = true,
-                    ValidAudience = jwtSettings["Audience"],
+                    ValidAudience = audience,
+
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 
         return services;
     }
+
 }

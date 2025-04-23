@@ -43,7 +43,6 @@ public class EmailService: IEmailService
 
     public async Task SendPasswordResetEmailAsync(string email, string username, string resetLink)
     {
-        // Implementación similar para reset de contraseña
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(
             _configuration["EmailSettings:SenderName"] ?? "Tu E-commerce", 
@@ -70,23 +69,17 @@ public class EmailService: IEmailService
     private async Task SendEmailAsync(MimeMessage message)
     {
         using var client = new SmtpClient();
-        
+    
         var emailSettings = _configuration.GetSection("EmailSettings");
-        var server = emailSettings["SmtpServer"];
-        var port = int.Parse(emailSettings["Port"] ?? "587");
-        var useSsl = bool.Parse(emailSettings["UseSsl"] ?? "false");
+    
+        await client.ConnectAsync(
+            emailSettings["SmtpServer"], 
+            int.Parse(emailSettings["Port"]), 
+            MailKit.Security.SecureSocketOptions.StartTls);
 
-        // Configuración del timeout (opcional)
-        client.Timeout = 10000; // 10 segundos
-
-        await client.ConnectAsync(server, port, useSsl);
-        
-        if (!string.IsNullOrEmpty(emailSettings["Username"]))
-        {
-            await client.AuthenticateAsync(
-                emailSettings["Username"], 
-                emailSettings["Password"]);
-        }
+        await client.AuthenticateAsync(
+            emailSettings["Username"], 
+            emailSettings["Password"]);
 
         await client.SendAsync(message);
         await client.DisconnectAsync(true);

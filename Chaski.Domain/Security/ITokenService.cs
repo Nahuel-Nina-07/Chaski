@@ -5,6 +5,7 @@ namespace Chaski.Domain.Security;
 
 public interface ITokenService
 {
-    string GenerateToken(User user, IList<string> roles);
-
+    string GenerateAccessToken(User user, IList<string> roles);
+    string GenerateRefreshToken();
+    ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
 }

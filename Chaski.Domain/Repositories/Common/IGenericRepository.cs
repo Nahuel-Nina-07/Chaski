@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace Chaski.Domain.Repositories.Common;
 
 public interface IGenericRepository <TEntity> where TEntity : class
