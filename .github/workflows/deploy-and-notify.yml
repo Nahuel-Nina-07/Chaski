@@ -19,35 +19,35 @@ jobs:
           dotnet publish -c Release -o ./publish
 
       # --- Paso 3: Desplegar en MonsterASP.NET ---
-      - name: Deploy to MonsterASP.NET
-        uses: rasmusbuchholdt/simply-web-deploy@2.1.0
-        with:
-          website-name: ${{ secrets.WEBSITE_NAME }}
-          server-computer-name: ${{ secrets.SERVER_COMPUTER }}
-          server-username: ${{ secrets.SERVER_USERNAME }}
-          server-password: ${{ secrets.SERVER_PASSWORD }}
-          source-path: './publish'
-          target-delete: true
+      - name: Deploy via Web Deploy
+    uses: microsoft/web-deploy@v1
+    with:
+      publishUrl: ${{ secrets.WEBDEPLOY_SERVER }}:8172
+      publishSite: ${{ secrets.WEBSITE_NAME }}
+      username: ${{ secrets.WEBDEPLOY_USERNAME }}
+      password: ${{ secrets.WEBDEPLOY_PASSWORD }}
+      package: './publish'
+      removeAdditionalFiles: true
 
-      - name: Prepare Slack Notification
-        id: prepare-slack-notification
-        run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "SLACK_TITLE=✅ Despliegue exitoso (develop)" >> $GITHUB_ENV
-            echo "SLACK_MESSAGE=La API se ha desplegado correctamente en MonsterASP.NET. Commit: ${{ github.sha }}" >> $GITHUB_ENV
-            echo "SLACK_COLOR=good" >> $GITHUB_ENV
-          else
-            echo "SLACK_TITLE=❌ Error en despliegue (develop)" >> $GITHUB_ENV
-            echo "SLACK_MESSAGE=Hubo un problema al desplegar la API. Revisa los logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
-            echo "SLACK_COLOR=danger" >> $GITHUB_ENV
-          fi
+  - name: Prepare Slack Notification
+    id: prepare-slack-notification
+    run: |
+      if [ "${{ job.status }}" == "success" ]; then
+        echo "SLACK_TITLE=✅ Despliegue exitoso" >> $GITHUB_ENV
+        echo "SLACK_MESSAGE=API publicada en ${{ secrets.WEBSITE_NAME }}" >> $GITHUB_ENV
+        echo "SLACK_COLOR=good" >> $GITHUB_ENV
+      else
+        echo "SLACK_TITLE=❌ Error en despliegue" >> $GITHUB_ENV
+        echo "SLACK_MESSAGE=Revisa los logs del job ${{ github.run_id }}" >> $GITHUB_ENV
+        echo "SLACK_COLOR=danger" >> $GITHUB_ENV
+      fi
 
-      - name: Send Slack Notification
-        if: always()  # Notifica siempre, incluso si falla
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_COLOR: ${{ env.SLACK_COLOR }}
-          SLACK_TITLE: ${{ env.SLACK_TITLE }}
-          SLACK_MESSAGE: ${{ env.SLACK_MESSAGE }}
-          SLACK_USERNAME: "Backend Chaski"
+  - name: Send Slack Notification
+    if: always()
+    uses: rtCamp/action-slack-notify@v2
+    env:
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      SLACK_COLOR: ${{ env.SLACK_COLOR || '#FF0000' }}
+      SLACK_TITLE: ${{ env.SLACK_TITLE || 'Notificación de despliegue' }}
+      SLACK_MESSAGE: ${{ env.SLACK_MESSAGE || 'Mensaje no disponible' }}
+      SLACK_USERNAME: "Backend Chaski"
