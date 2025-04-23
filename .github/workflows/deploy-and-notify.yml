@@ -1,54 +1,59 @@
-name: Deploy API to MonsterASP.NET with Notifications
+name: Build, Test & Deploy to MonsterASP.NET
 
 on:
   push:
-    branches: [ "develop" ]
+    branches:
+      - develop # O la rama que uses para desplegar
 
 jobs:
-  deploy-and-notify:
+  build-test-deploy:
     runs-on: windows-latest
+
     steps:
-      # --- Paso 1: Checkout del código ---
-      - name: Checkout code
+      - name: 🧾 Clonar repositorio
         uses: actions/checkout@v4
 
-      # --- Paso 2: Compilar la API (.NET) ---
-      - name: Build .NET API
-        run: |
-          dotnet restore
-          dotnet publish -c Release -o ./publish
-
-      # --- Paso 3: Desplegar en MonsterASP.NET ---
-      - name: Deploy via Web Deploy
-        uses: microsoft/web-deploy@v1
+      - name: 🛠️ Configurar .NET 8
+        uses: actions/setup-dotnet@v3
         with:
-          publishUrl: ${{ secrets.WEBDEPLOY_SERVER }}:8172
-          publishSite: ${{ secrets.WEBSITE_NAME }}
-          username: ${{ secrets.WEBDEPLOY_USERNAME }}
-          password: ${{ secrets.WEBDEPLOY_PASSWORD }}
-          package: './publish'
-          removeAdditionalFiles: true
+          dotnet-version: "8.0.x"
 
-      # --- Paso 4: Notificación en Slack ---
-      - name: Prepare Slack Notification
-        id: prepare-slack-notification
-        run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "SLACK_TITLE=✅ Despliegue exitoso" >> $GITHUB_ENV
-            echo "SLACK_MESSAGE=API publicada en ${{ secrets.WEBSITE_NAME }}" >> $GITHUB_ENV
-            echo "SLACK_COLOR=good" >> $GITHUB_ENV
-          else
-            echo "SLACK_TITLE=❌ Error en despliegue" >> $GITHUB_ENV
-            echo "SLACK_MESSAGE=Revisa los logs del job ${{ github.run_id }}" >> $GITHUB_ENV
-            echo "SLACK_COLOR=danger" >> $GITHUB_ENV
-          fi
+      - name: 📦 Restaurar paquetes
+        run: dotnet restore
 
-      - name: Send Slack Notification
+      - name: 🧪 Compilar la solución
+        run: dotnet build --no-restore --configuration Release
+
+      - name: 🧪 Ejecutar tests
+        run: dotnet test --no-build --configuration Release --verbosity normal
+
+      - name: 📤 Publicar proyecto
+        run: dotnet publish --configuration Release -o ./publish
+
+      - name: 🚀 Desplegar a MonsterASP.NET
+        if: success()
+        uses: rasmusbuchholdt/simply-web-deploy@2.1.0
+        with:
+          website-name: ${{ secrets.WEBSITE_NAME }}
+          server-computer-name: ${{ secrets.WEBDEPLOY_SERVER }}
+          server-username: ${{ secrets.WEBDEPLOY_USERNAME }}
+          server-password: ${{ secrets.WEBDEPLOY_PASSWORD }}
+
+      - name: ✅ Mensaje de éxito
+        if: success()
+        run: echo "🚀 ¡Despliegue a MonsterASP.NET completado exitosamente!"
+
+      - name: ❌ Mensaje de error
+        if: failure()
+        run: echo "❌ Error en build, test o deploy. Revisa los logs en la pestaña Actions."
+
+      - name: 🔔 Notificación Slack (opcional)
         if: always()
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_COLOR: ${{ env.SLACK_COLOR || '#FF0000' }}
-          SLACK_TITLE: ${{ env.SLACK_TITLE || 'Notificación de despliegue' }}
-          SLACK_MESSAGE: ${{ env.SLACK_MESSAGE || 'Mensaje no disponible' }}
-          SLACK_USERNAME: "Backend Chaski"
+          SLACK_COLOR: ${{ job.status == 'success' && 'good' || 'danger' }}
+          SLACK_USERNAME: Chaski CI/CD
+          SLACK_TITLE: "Despliegue a MonsterASP.NET"
+          SLACK_MESSAGE: ${{ job.status == 'success' && '✅ Se desplegó exitosamente.' || '❌ Falló el despliegue. Revisa los logs en GitHub Actions.' }}
+          SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
