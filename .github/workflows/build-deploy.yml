@@ -30,7 +30,7 @@ jobs:
           password: ${{ secrets.MONSTERASP_FTP_PASSWORD }}  # Contraseña FTP (almacenada como un secreto)
           port: 21                              # Puerto FTP
           protocol: ftp                         # Usar FTP
-          local-dir: ./publish                  # Carpeta que se publica
+          local-dir: ./publish/                  # Carpeta que se publica
           server-dir: /wwwroot/                 # Carpeta en el servidor donde se sube el contenido
           dangerous-clean-slate: false         # Evita limpiar la carpeta en el servidor antes de subir (recomendado false)
 
