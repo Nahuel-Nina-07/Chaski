@@ -3,7 +3,8 @@ name: Deploy to MonsterASP.NET via FTP
 on:
   push:
     branches:
-      - develop  # Cambiar si usas otra rama para producción
+      - develop  # Cambia esto si usas otra rama para producción
+
 jobs:
   build_and_deploy:
     runs-on: windows-latest
@@ -14,17 +15,29 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 8.0
-          
+
       - name: Install dependencies
         run: dotnet restore
-        
+
       - name: Build and Publish Project
         run: dotnet publish -c Release -o ./publish
-        
-      - name: Deploy to MonsterASP.NET via WebDeploy
-        uses: rasmusbuchholdt/simply-web-deploy@2.1.0
+
+      - name: Deploy to MonsterASP.NET via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4
         with:
-          website-name: ${{ secrets.WEBSITE_NAME }}
-          server-computer-name: ${{ secrets.WEBDEPLOY_SERVER }}
-          server-username: ${{ secrets.WEBDEPLOY_USERNAME }}
-          server-password: ${{ secrets.WEBDEPLOY_PASSWORD }}
+          server: site23621.siteasp.net         # Servidor FTP
+          username: site23621                   # Nombre de usuario FTP
+          password: ${{ secrets.MONSTERASP_FTP_PASSWORD }}  # Contraseña FTP (almacenada como un secreto)
+          port: 21                              # Puerto FTP
+          protocol: ftp                         # Usar FTP
+          local-dir: ./publish                  # Carpeta que se publica
+          server-dir: /wwwroot/                 # Carpeta en el servidor donde se sube el contenido
+          dangerous-clean-slate: false         # Evita limpiar la carpeta en el servidor antes de subir (recomendado false)
+
+      - name: ✅ Éxito
+        if: success()
+        run: echo "✅ Despliegue completado exitosamente."
+
+      - name: ❌ Error
+        if: failure()
+        run: echo "❌ Falló el build o el deploy. Revisa los logs en Actions."
