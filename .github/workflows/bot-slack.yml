@@ -1,0 +1,43 @@
+name: Slack Notification
+
+on:
+  pull_request:
+    branches:
+      - production
+  push:
+    branches:
+      - develop
+
+jobs:
+  slackNotification:
+    name: Slack Notification
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set Slack Message
+      id: set-slack-message
+      run: |
+        if [ "${{ github.event_name }}" == "pull_request" ]; then
+          echo "SLACK_TITLE=Nuevo Pull Request hacia production" >> $GITHUB_ENV
+          echo "SLACK_MESSAGE=Se ha creado un Pull Request para la rama production. Revisa los cambios y aprueba si todo está correcto :rocket:. URL: ${{ github.event.pull_request.html_url }}" >> $GITHUB_ENV
+        elif [ "${{ github.event_name }}" == "push" ]; then
+          echo "SLACK_TITLE=Nuevo Push en la rama develop" >> $GITHUB_ENV
+          echo "SLACK_MESSAGE=Se ha realizado un push en la rama develop. Verifica los cambios aquí :rocket:. URL: ${{ github.server_url }}/${{ github.repository }}/commits/${{ github.sha }}" >> $GITHUB_ENV
+        fi
+
+    - name: Enviar Notificación a Slack
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        
+        SLACK_COLOR: good
+        SLACK_USERNAME: Backend Chaski
+        SLACK_TITLE: ${{ env.SLACK_TITLE }}
+        SLACK_MESSAGE: ${{ env.SLACK_MESSAGE }}
+        SLACK_MSG_AUTHOR: ${{ github.actor }}
+
+      with:
+        author_name: "Backend Chaski"
+        fields: repo,message,commit,author,action,eventName
+

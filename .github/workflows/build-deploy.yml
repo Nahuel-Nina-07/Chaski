@@ -1,0 +1,30 @@
+name: Deploy to MonsterASP.NET via FTP
+
+on:
+  push:
+    branches:
+      - develop  # Cambiar si usas otra rama para producción
+jobs:
+  build_and_deploy:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0
+          
+      - name: Install dependencies
+        run: dotnet restore
+        
+      - name: Build and Publish Project
+        run: dotnet publish -c Release -o ./publish
+        
+      - name: Deploy to MonsterASP.NET via WebDeploy
+        uses: rasmusbuchholdt/simply-web-deploy@2.1.0
+        with:
+          website-name: ${{ secrets.WEBSITE_NAME }}
+          server-computer-name: ${{ secrets.WEBDEPLOY_SERVER }}
+          server-username: ${{ secrets.WEBDEPLOY_USERNAME }}
+          server-password: ${{ secrets.WEBDEPLOY_PASSWORD }}
