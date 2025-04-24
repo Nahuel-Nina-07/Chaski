@@ -75,16 +75,13 @@ app.UseCors("CORSPolicy");
 app.UseMiddleware<MiddlewareException>();
 app.UseMiddleware<NotFoundMiddleware>();
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "CHASKI API v1");
-        c.RoutePrefix = "swagger";
-        c.EnableFilter();
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "CHASKI API v1");
+    c.RoutePrefix = "swagger";
+    c.EnableFilter();
+});
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
